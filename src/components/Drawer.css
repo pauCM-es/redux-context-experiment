@@ -1,0 +1,147 @@
+/* Estilos para el componente Drawer */
+.drawer-toggle {
+  margin: 1rem 0;
+  padding: 0.8rem 1.5rem;
+  background-color: #4c8bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.drawer-toggle:hover {
+  background-color: #3a7be0;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 400px;
+  background-color: #ffffff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.drawer-closed {
+  transform: translateX(100%);
+}
+
+.drawer-open {
+  transform: translateX(0);
+}
+
+.drawer-content {
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.drawer-content h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  border-bottom: 2px solid #4c8bff;
+  padding-bottom: 0.5rem;
+}
+
+.drawer-content p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.drawer-content code {
+  background: #f0f0f0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: monospace;
+  color: #333;
+}
+
+.drawer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.drawer-controls button {
+  padding: 0.6rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.drawer-controls button:hover {
+  background-color: #218838;
+}
+
+.drawer-controls input {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.drawer-close {
+  margin-top: auto;
+  padding: 0.6rem 1rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.drawer-close:hover {
+  background-color: #c82333;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  cursor: pointer;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .drawer {
+    background-color: #2a2a2a;
+    color: #ddd;
+  }
+  
+  .drawer-content h3 {
+    color: #ddd;
+    border-bottom-color: #6bb5ff;
+  }
+  
+  .drawer-content p {
+    color: #ccc;
+  }
+  
+  .drawer-content code {
+    background: #333;
+    color: #f9f9f9;
+  }
+  
+  .drawer-controls input {
+    background-color: #333;
+    border-color: #555;
+    color: #ddd;
+  }
+}
