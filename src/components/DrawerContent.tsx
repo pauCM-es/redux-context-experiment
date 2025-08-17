@@ -2,11 +2,10 @@ import { useEffect } from "react";
 import { useDrawerContext } from "../context/drawerContext";
 
 const DrawerContent = () => {
-    const {
-        contextState: { isOpen },
-        dispatch,
-        getState,
-    } = useDrawerContext();
+    const { ctxDispatch, ctxGetState, ctxSelect, ctxState } =
+        useDrawerContext();
+    const plazaAragonValues = ctxSelect("plazaAragonValues");
+    const isOpen = ctxSelect("selectIsOpen");
 
     console.log("DrawerContent render");
 
@@ -14,14 +13,25 @@ const DrawerContent = () => {
         console.log("[DrawerContent Effect] isOpen changed", isOpen);
     }, [isOpen]);
 
+    useEffect(() => {
+        console.log(
+            "[DrawerContent Effect] plazaAragonValues changed",
+            plazaAragonValues
+        );
+    }, [plazaAragonValues]);
+
+    useEffect(() => {
+        console.log("[DrawerContent Effect] ctxState changed", ctxState);
+    }, [ctxState]);
+
     // Ejemplo de uso de getState() sin causar re-renders
     useEffect(() => {
-        const currentState = getState();
+        const currentState = ctxGetState();
         console.log(
             "[DrawerContent getState] Current drawer state:",
             currentState
         );
-    }, [getState]);
+    }, [ctxGetState]);
 
     return (
         <div className="drawer-context-content">
@@ -30,14 +40,14 @@ const DrawerContent = () => {
             </p>
 
             <div className="drawer-controls">
-                <button onClick={() => dispatch("toggleDrawer")}>
-                    Toggle (Dispatch)
+                <button onClick={() => ctxDispatch("toggleDrawer")}>
+                    Dispatch Toggle (Dispatch)
                 </button>
 
                 {/* Botón para ver estado sin re-render */}
                 <button
                     onClick={() => {
-                        const state = getState();
+                        const state = ctxGetState();
                         console.log(
                             "Current drawer state via getState():",
                             state

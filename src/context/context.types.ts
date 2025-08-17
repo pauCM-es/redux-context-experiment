@@ -4,10 +4,9 @@ import type {
     ContextProviderName,
     GenericRecord,
 } from "../types/utils.types";
+import type { Capitalize } from "./contextFactory";
 
 export type ContextValue<T> = T;
-
-type Selector<TState> = (state: TState) => any;
 
 type Payload = any;
 
@@ -19,14 +18,28 @@ export interface ContextProviderProps<T> {
 
 type ResultKeys<N extends string> = ContextHookName<N> | ContextProviderName<N>;
 
+export type Selector<TState> = (state: TState) => any;
+// Helper type to create auto selectors for first level properties
+
+type AutoSelectors<TState> = {
+    [K in keyof TState as `select${Capitalize<string & K>}`]: (
+        state: TState
+    ) => TState[K];
+};
+
+// Combined selectors type
+export type AllSelectors<TState, TSelectors> = TSelectors &
+    AutoSelectors<TState>;
+
 export interface ContextConfig<
     TState extends GenericRecord,
-    TActions extends Record<string, Action<TState>>
+    TActions extends Record<string, Action<TState>>,
+    TSelectors extends Record<string, Selector<TState>>
 > {
     contextName: string;
     initialState: TState;
     actions?: TActions;
-    selectors?: Record<string, Selector<TState>>;
+    selectors?: TSelectors;
 }
 
 export type Dispatcher<
@@ -39,27 +52,34 @@ export type Dispatcher<
 
 export type ContextHookResult<
     TState extends GenericRecord,
-    TActions extends Record<string, Action<TState>>
+    TActions extends Record<string, Action<TState>>,
+    TSelectors extends Record<string, Selector<TState>>
 > = () => {
     ctxState: TState;
-    getCtxState: () => TState;
+    ctxGetState: () => TState;
     ctxDispatch: Dispatcher<TState, TActions>;
+    ctxSelect: (
+        selectorKey: keyof AllSelectors<TState, TSelectors>
+    ) => ReturnType<AllSelectors<TState, TSelectors>[typeof selectorKey]>;
+    ctxSet: (newState: Partial<TState>) => void;
 };
 
 export type ContextFallback<
     TState extends GenericRecord,
-    TActions extends Record<string, Action<TState>>
-> = ReturnType<ContextHookResult<TState, TActions>>;
+    TActions extends Record<string, Action<TState>>,
+    TSelectors extends Record<string, Selector<TState>>
+> = ReturnType<ContextHookResult<TState, TActions, TSelectors>>;
 
 export type FactoryResult<
     TState extends GenericRecord,
     TActions extends Record<string, Action<TState>>,
-    TConfig extends ContextConfig<TState, TActions>
+    TSelectors extends Record<string, Selector<TState>>,
+    TConfig extends ContextConfig<TState, TActions, TSelectors>
 > = {
     [key in ResultKeys<TConfig["contextName"]>]: key extends ContextHookName<
         TConfig["contextName"]
     >
-        ? ContextHookResult<TState, TActions>
+        ? ContextHookResult<TState, TActions, TSelectors>
         : key extends ContextProviderName<TConfig["contextName"]>
         ? React.FC<ContextProviderProps<TState>>
         : never;
