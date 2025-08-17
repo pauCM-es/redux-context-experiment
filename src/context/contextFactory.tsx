@@ -45,19 +45,6 @@ export function createContextFactory<
         ctxSet: () => void 0,
     };
 
-    // Create auto selectors for first-level properties
-    const allSelectors: AllSelectors<TState, TSelectors> = Object.keys(
-        initialState
-    ).reduce(
-        (acc, key) => {
-            const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
-            acc[`select${capitalizedKey}`] = (state: TState) =>
-                state[key as keyof TState];
-            return acc;
-        },
-        { ...selectors } as AllSelectors<TState, TSelectors>
-    );
-
     const Context = createContext(contextFallback);
 
     //! ------- HOOK ----------------------
@@ -71,37 +58,32 @@ export function createContextFactory<
             );
         }
 
-        // Only allow predefined selector keys
-        // const selectedCtxState = useMemo(() => {
-        //     if (!allSelectors || !selectorKey) {
-        //         return context;
-        //     }
-        //     const selector = allSelectors[selectorKey];
-
-        //     if (!selector) {
-        //         throw new Error(
-        //             `Selector "${String(
-        //                 selectorKey
-        //             )}" not found. Available selectors: ${Object.keys(
-        //                 allSelectors
-        //             ).join(", ")}`
-        //         );
-        //     }
-        //     return selector(context.ctxState);
-        // }, [context, selectorKey]);
-
         return context;
     }
 
     //! ---------- PROVIDER --------------------
     const Provider = ({ children }: ContextProviderProps<TState>) => {
-        const [, forceUpdate] = useState({});
+        const [ctxState, setCtxState] = useState<TState>(initialState);
         const stateRef = useRef<TState>(initialState);
+        console.log("%c===> PROVIDER", "background: black; color: white", {
+            stateRef,
+        });
 
-        // Force re-render function
-        const triggerUpdate = useCallback(() => forceUpdate({}), []);
+        // Create auto selectors for first-level properties
+        const allSelectors = useMemo(() => {
+            return Object.keys(initialState).reduce(
+                (acc, key) => {
+                    const capitalizedKey =
+                        key.charAt(0).toUpperCase() + key.slice(1);
+                    acc[`select${capitalizedKey}`] = (state: TState) =>
+                        state[key as keyof TState];
+                    return acc;
+                },
+                { ...selectors } as AllSelectors<TState, TSelectors>
+            );
+        }, []);
 
-        // getState function that accesses the reference
+        // getState functin that accesses the reference
         const ctxGetState = useCallback(() => stateRef.current, []);
 
         const ctxSelect = useCallback(
@@ -112,9 +94,9 @@ export function createContextFactory<
                         `Selector "${String(selectorKey)}" not found.`
                     );
                 }
-                return selector(stateRef.current);
+                return selector(ctxState);
             },
-            []
+            [ctxState]
         );
 
         // Dispatch (always triggers re-renders with deep updates)
@@ -123,13 +105,18 @@ export function createContextFactory<
                 actionName: TActionKey,
                 payload: Parameters<TActions[TActionKey]>[1]
             ) => {
-                const newState = produce(stateRef.current, (draft) => {
-                    actions?.[actionName]?.(draft as TState, payload);
+                console.log(
+                    "%c===> DISPATCH ",
+                    "background: orange; color: white",
+                    { actionName }
+                );
+                setCtxState((prev) => {
+                    const newState = { ...prev };
+                    actions?.[actionName]?.(newState as TState, payload);
+                    return { ...newState };
                 });
-                stateRef.current = newState;
-                triggerUpdate();
             },
-            [triggerUpdate]
+            []
         );
 
         // Normal set (triggers re-renders + shallow update)
@@ -138,14 +125,28 @@ export function createContextFactory<
                 partial: Partial<TState> | ((state: TState) => Partial<TState>)
             ) => {
                 if (typeof partial === "function") {
-                    const newState = partial(stateRef.current);
-                    stateRef.current = { ...stateRef.current, ...newState };
+                    console.log(
+                        "%c===>CTX SET",
+                        "background: orange; color: white",
+                        { partial }
+                    );
+                    setCtxState((prev) => ({
+                        ...prev,
+                        ...partial(prev),
+                    }));
                 } else {
-                    stateRef.current = { ...stateRef.current, ...partial };
+                    setCtxState((prev) => ({
+                        ...prev,
+                        partial,
+                    }));
+                    console.log(
+                        "%c===>CTX SET",
+                        "background: orange; color: white",
+                        { partial }
+                    );
                 }
-                triggerUpdate();
             },
-            [triggerUpdate]
+            []
         );
 
         // Immer-based deep updates with structural sharing (triggers re-renders)
@@ -153,73 +154,20 @@ export function createContextFactory<
             (recipe: (draft: TState) => void | TState) => {
                 const newState = produce(stateRef.current, recipe);
                 stateRef.current = newState;
-                triggerUpdate();
-            },
-            [triggerUpdate]
-        );
-
-        // Silent set (NO re-renders + shallow update)
-        const ctxSetSilent = useCallback(
-            (
-                partial: Partial<TState> | ((state: TState) => Partial<TState>)
-            ) => {
-                if (typeof partial === "function") {
-                    const newState = partial(stateRef.current);
-                    stateRef.current = { ...stateRef.current, ...newState };
-                } else {
-                    stateRef.current = { ...stateRef.current, ...partial };
-                }
-                // No triggerUpdate() = no re-renders
             },
             []
-        );
-
-        // Silent Immer-based updates (NO re-renders + deep update with structural sharing)
-        const ctxProduceSilent = useCallback(
-            (recipe: (draft: TState) => void | TState) => {
-                const newState = produce(stateRef.current, recipe);
-                stateRef.current = newState;
-                // No triggerUpdate() = no re-renders
-            },
-            []
-        );
-
-        // Batch updates (multiple silent + single re-render)
-        const ctxBatch = useCallback(
-            (
-                batchFn: (
-                    produce: typeof ctxProduceSilent,
-                    set: typeof ctxSetSilent
-                ) => void
-            ) => {
-                batchFn(ctxProduceSilent, ctxSetSilent);
-                triggerUpdate();
-            },
-            [ctxProduceSilent, ctxSetSilent, triggerUpdate]
         );
 
         const extendedValue = useMemo(
             () => ({
-                ctxState: stateRef.current,
+                ctxState,
                 ctxGetState,
                 ctxSelect,
                 ctxSet, // Shallow + re-render
-                // ctxProduce, // Deep + re-render (with structural sharing)
-                // ctxSetSilent, // Shallow + silent
-                // ctxProduceSilent, // Deep + silent (with structural sharing)
                 ctxDispatch, // Actions + re-render (with Immer)
-                // ctxBatch, // Multiple updates + single re-render
+                // ctxProduce, // Deep + re-render (with structural sharing)
             }),
-            [
-                ctxGetState,
-                ctxSelect,
-                ctxSet,
-                // ctxProduce,
-                // ctxSetSilent,
-                // ctxProduceSilent,
-                ctxDispatch,
-                // ctxBatch,
-            ]
+            [ctxState, ctxGetState, ctxSelect, ctxSet, ctxDispatch]
         );
 
         return (

@@ -10,7 +10,7 @@ import DrawerContent from "./DrawerContent";
 
 // Componente provider
 const ContextTesting = () => {
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(true);
     console.log("ContextTesting render");
 
     return (
@@ -18,7 +18,17 @@ const ContextTesting = () => {
             {/* <TestContextProvider value={contextValue}> */}
             <h2>Context Testing</h2>
 
-            <button onClick={() => setDrawerOpen((prev) => !prev)}>
+            <button
+                onClick={() => setDrawerOpen((prev) => !prev)}
+                style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    position: "fixed",
+                    top: "10px",
+                    right: "30px",
+                    zIndex: 9999,
+                }}
+            >
                 {drawerOpen ? "Remove drawer" : "Create Drawer"}
             </button>
             <div className="context-testing">

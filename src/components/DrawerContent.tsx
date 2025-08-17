@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useDrawerContext } from "../context/drawerContext";
+import DrawerActions from "./DrawerActionsFixed";
+import StateMonitor from "./StateMonitorFixed";
 
 const DrawerContent = () => {
     const { ctxDispatch, ctxGetState, ctxSelect, ctxState } =
@@ -7,7 +9,10 @@ const DrawerContent = () => {
     const plazaAragonValues = ctxSelect("plazaAragonValues");
     const isOpen = ctxSelect("selectIsOpen");
 
-    console.log("DrawerContent render");
+    console.log("DrawerContent render", {
+        isOpen,
+        ctxState,
+    });
 
     useEffect(() => {
         console.log("[DrawerContent Effect] isOpen changed", isOpen);
@@ -35,28 +40,11 @@ const DrawerContent = () => {
 
     return (
         <div className="drawer-context-content">
-            <p>
-                Drawer is: <code>{isOpen ? "Open" : "Closed"}</code>
-            </p>
+            {/* Child component with context methods */}
+            <DrawerActions />
 
-            <div className="drawer-controls">
-                <button onClick={() => ctxDispatch("toggleDrawer")}>
-                    Dispatch Toggle (Dispatch)
-                </button>
-
-                {/* Botón para ver estado sin re-render */}
-                <button
-                    onClick={() => {
-                        const state = ctxGetState();
-                        console.log(
-                            "Current drawer state via getState():",
-                            state
-                        );
-                    }}
-                >
-                    Log State (No Re-render)
-                </button>
-            </div>
+            {/* Individual state monitors */}
+            <StateMonitor />
         </div>
     );
 };

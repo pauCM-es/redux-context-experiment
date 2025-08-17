@@ -4,7 +4,7 @@ import ReduxTesting from "./components/ReduxTesting";
 import ContextTesting from "./components/ContextTesting";
 
 function App() {
-    const [showRedux, setShowRedux] = useState(true);
+    const [showRedux, setShowRedux] = useState(false);
 
     return (
         <>

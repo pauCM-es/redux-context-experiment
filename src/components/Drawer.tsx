@@ -11,16 +11,18 @@ interface DrawerProps {
 
 // Componente interno que consume el contexto del drawer
 const DrawerUI = ({ children }: DrawerProps) => {
-    const { ctxState, ctxDispatch, ctxSet } = useDrawerContext();
-
-    console.log("DrawerUI render");
+    const { ctxState, ctxSet, ctxSelect } = useDrawerContext();
+    const isOpenCtx = ctxSelect("selectIsOpen");
+    console.log("DrawerUI render", { isOpenCtx });
 
     return (
         <>
             <button
                 className="drawer-toggle"
                 onClick={() => {
-                    ctxSet({ isOpen: true });
+                    ctxSet((state) => ({
+                        isOpen: !state.isOpen,
+                    }));
                 }}
             >
                 {ctxState.isOpen ? "Close Drawer" : "Open Drawer"}
@@ -28,27 +30,15 @@ const DrawerUI = ({ children }: DrawerProps) => {
 
             <div
                 className={`drawer ${
-                    ctxState.isOpen ? "drawer-open" : "drawer-closed"
+                    "drawer-open"
+                    // ctxState.isOpen ? "drawer-open" : "drawer-closed"
                 }`}
             >
                 <div className="drawer-content">
                     <h3>Drawer Component</h3>
                     {children}
-                    <button
-                        className="drawer-close"
-                        onClick={() => ctxDispatch("toggleDrawer")}
-                    >
-                        Dispatch Open Drawer
-                    </button>
                 </div>
             </div>
-
-            {ctxState.isOpen && (
-                <div
-                    className="drawer-overlay"
-                    onClick={() => ctxDispatch("toggleDrawer")}
-                ></div>
-            )}
         </>
     );
 };

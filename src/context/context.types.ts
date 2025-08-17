@@ -61,7 +61,9 @@ export type ContextHookResult<
     ctxSelect: (
         selectorKey: keyof AllSelectors<TState, TSelectors>
     ) => ReturnType<AllSelectors<TState, TSelectors>[typeof selectorKey]>;
-    ctxSet: (newState: Partial<TState>) => void;
+    ctxSet: (
+        newState: Partial<TState> | ((state: TState) => Partial<TState>)
+    ) => void;
 };
 
 export type ContextFallback<
