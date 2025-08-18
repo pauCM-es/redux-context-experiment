@@ -1,18 +1,25 @@
 import { useEffect, useRef } from "react";
 import { useDrawerContext } from "../context/drawerContext";
+import Counter from "./Counter";
+import type { CounterRef } from "./Counter";
 
 type Timeline = [string, number][];
 
 // Individual monitor component for isOpen
 const IsOpenMonitor = () => {
-    const { ctxSelect } = useDrawerContext();
-    const isOpen = ctxSelect("selectIsOpen") as boolean;
-    const renderCount = useRef(0);
-    renderCount.current++;
+    const { ctxSelect, ctxDispatch } = useDrawerContext();
+    const isOpen = ctxSelect("selectIsOpen");
+    const sensors = ctxSelect("selectSensors");
+    const stateChangesRef = useRef<CounterRef>(null);
+    const renderCountRef = useRef<CounterRef>(null);
+
+    // Increment render count on every render
+    renderCountRef.current?.increment();
 
     useEffect(() => {
         console.log("[IsOpenMonitor Effect] isOpen changed:", isOpen);
-    }, [isOpen]);
+        stateChangesRef.current?.increment();
+    }, [isOpen, ctxDispatch, sensors]);
 
     return (
         <div
@@ -27,24 +34,24 @@ const IsOpenMonitor = () => {
                 IsOpen Monitor
             </h4>
             <p style={{ margin: "4px 0" }}>
-                <strong>Monitoring:</strong> isOpen
-            </p>
-            <p style={{ margin: "4px 0" }}>
                 <strong>Current Value:</strong>{" "}
                 <code>{isOpen ? "Open" : "Closed"}</code>
             </p>
             <p style={{ margin: "4px 0" }}>
-                <strong>Render Count:</strong>{" "}
-                <span
-                    style={{
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        padding: "2px 8px",
-                        borderRadius: "4px",
-                    }}
-                >
-                    {renderCount.current}
-                </span>
+                <Counter
+                    ref={stateChangesRef}
+                    label="State changes count"
+                    backgroundColor="#4CAF50"
+                    initialCount={1}
+                />
+            </p>
+            <p style={{ margin: "4px 0" }}>
+                <Counter
+                    ref={renderCountRef}
+                    label="Render count"
+                    backgroundColor="#388E3C"
+                    initialCount={1}
+                />
             </p>
         </div>
     );
@@ -59,11 +66,15 @@ const SensorsMonitor = () => {
             metadata: { lastUpdate: string };
         };
     };
-    const renderCount = useRef(0);
-    renderCount.current++;
+    const stateChangesRef = useRef<CounterRef>(null);
+    const renderCountRef = useRef<CounterRef>(null);
+
+    // Increment render count on every render
+    renderCountRef.current?.increment();
 
     useEffect(() => {
         console.log("[SensorsMonitor Effect] sensors changed:", sensors);
+        stateChangesRef.current?.increment();
     }, [sensors]);
 
     const sensorCount = Object.keys(sensors).length;
@@ -85,26 +96,26 @@ const SensorsMonitor = () => {
                 Sensors Monitor
             </h4>
             <p style={{ margin: "4px 0" }}>
-                <strong>Monitoring:</strong> sensors
-            </p>
-            <p style={{ margin: "4px 0" }}>
                 <strong>Sensor Count:</strong> <code>{sensorCount}</code>
             </p>
             <p style={{ margin: "4px 0" }}>
                 <strong>Total Values:</strong> <code>{totalValues}</code>
             </p>
             <p style={{ margin: "4px 0" }}>
-                <strong>Render Count:</strong>{" "}
-                <span
-                    style={{
-                        backgroundColor: "#2196F3",
-                        color: "white",
-                        padding: "2px 8px",
-                        borderRadius: "4px",
-                    }}
-                >
-                    {renderCount.current}
-                </span>
+                <Counter
+                    ref={stateChangesRef}
+                    label="State changes count"
+                    backgroundColor="#2196F3"
+                    initialCount={1}
+                />
+            </p>
+            <p style={{ margin: "4px 0" }}>
+                <Counter
+                    ref={renderCountRef}
+                    label="Render count"
+                    backgroundColor="#1976D2"
+                    initialCount={1}
+                />
             </p>
         </div>
     );
@@ -114,14 +125,18 @@ const SensorsMonitor = () => {
 const TimelineMonitor = () => {
     const { ctxSelect } = useDrawerContext();
     const timelineData = ctxSelect("selectTimelineData") as Timeline;
-    const renderCount = useRef(0);
-    renderCount.current++;
+    const stateChangesRef = useRef<CounterRef>(null);
+    const renderCountRef = useRef<CounterRef>(null);
+
+    // Increment render count on every render
+    renderCountRef.current?.increment();
 
     useEffect(() => {
         console.log(
             "[TimelineMonitor Effect] timelineData changed:",
             timelineData
         );
+        stateChangesRef.current?.increment();
     }, [timelineData]);
 
     return (
@@ -137,9 +152,6 @@ const TimelineMonitor = () => {
                 Timeline Monitor
             </h4>
             <p style={{ margin: "4px 0" }}>
-                <strong>Monitoring:</strong> timelineData
-            </p>
-            <p style={{ margin: "4px 0" }}>
                 <strong>Items Count:</strong> <code>{timelineData.length}</code>
             </p>
             <p style={{ margin: "4px 0" }}>
@@ -153,17 +165,76 @@ const TimelineMonitor = () => {
                 </code>
             </p>
             <p style={{ margin: "4px 0" }}>
-                <strong>Render Count:</strong>{" "}
-                <span
-                    style={{
-                        backgroundColor: "#FF9800",
-                        color: "white",
-                        padding: "2px 8px",
-                        borderRadius: "4px",
-                    }}
-                >
-                    {renderCount.current}
-                </span>
+                <Counter
+                    ref={stateChangesRef}
+                    label="State changes count"
+                    backgroundColor="#FF9800"
+                    initialCount={1}
+                />
+            </p>
+            <p style={{ margin: "4px 0" }}>
+                <Counter
+                    ref={renderCountRef}
+                    label="Render count"
+                    backgroundColor="#F57C00"
+                    initialCount={1}
+                />
+            </p>
+        </div>
+    );
+};
+
+// Individual monitor component for global state
+const GlobalStateMonitor = () => {
+    const { ctxState } = useDrawerContext();
+    // Monitor the entire global state by accessing it directly
+    const stateChangesRef = useRef<CounterRef>(null);
+    const renderCountRef = useRef<CounterRef>(null);
+
+    // Increment render count on every render
+    renderCountRef.current?.increment();
+
+    useEffect(() => {
+        console.log(
+            "[GlobalStateMonitor Effect] Global state changed:",
+            ctxState
+        );
+        stateChangesRef.current?.increment();
+    }, [ctxState]);
+
+    // Get some computed values from the global state
+    const stateKeys = Object.keys(ctxState);
+
+    return (
+        <div
+            style={{
+                border: "2px solid #9C27B0",
+                padding: "16px",
+                borderRadius: "8px",
+                backgroundColor: "#f3e5f5",
+            }}
+        >
+            <h4 style={{ margin: "0 0 8px 0", color: "#7B1FA2" }}>
+                Global State Monitor
+            </h4>
+            <p style={{ margin: "4px 0" }}>
+                <strong>State Keys:</strong> <code>{stateKeys.join(", ")}</code>
+            </p>
+            <p style={{ margin: "4px 0" }}>
+                <Counter
+                    ref={stateChangesRef}
+                    label="State changes count"
+                    backgroundColor="#9C27B0"
+                    initialCount={1}
+                />
+            </p>
+            <p style={{ margin: "4px 0" }}>
+                <Counter
+                    ref={renderCountRef}
+                    label="Render count"
+                    backgroundColor="#7B1FA2"
+                    initialCount={1}
+                />
             </p>
         </div>
     );
@@ -185,6 +256,7 @@ const StateMonitor = () => {
                 <IsOpenMonitor />
                 <SensorsMonitor />
                 <TimelineMonitor />
+                <GlobalStateMonitor />
             </div>
         </div>
     );
