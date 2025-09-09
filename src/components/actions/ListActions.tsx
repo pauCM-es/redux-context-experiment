@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	useBasicContext,
 	addToList,
 	removeFromList,
 } from "../../context/basicContext";
+import Item from "../isolated/Item";
+import ItemsList from "../isolated/ItemsList";
 
 const ListActions = () => {
 	console.log("[RENDER] ListActions");
 
-	const { list, setList } = useBasicContext();
+	// const { list, setList } = useBasicContext();
 	const [newListItem, setNewListItem] = useState("");
+	const [list, setList] = useState<string[]>([]);
+
+	useEffect(() => {
+		console.log("[EFFECT] setList");
+	}, [setList]);
 
 	const handleAddListItem = () => {
 		if (newListItem.trim()) {
@@ -75,28 +82,7 @@ const ListActions = () => {
 							marginBottom: "8px",
 						}}>
 						<ul style={{ margin: 0, paddingLeft: "20px" }}>
-							{list.map((item, index) => (
-								<li
-									key={index}
-									style={{ marginBottom: "4px" }}>
-									{item}{" "}
-									<button
-										onClick={() =>
-											handleRemoveListItem(index)
-										}
-										style={{
-											padding: "2px 6px",
-											backgroundColor: "#FF5722",
-											color: "white",
-											border: "none",
-											borderRadius: "4px",
-											marginLeft: "8px",
-											cursor: "pointer",
-										}}>
-										×
-									</button>
-								</li>
-							))}
+							<ItemsList items={list} />
 						</ul>
 					</div>
 					<button

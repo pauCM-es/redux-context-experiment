@@ -40,3 +40,22 @@
 - Components that don't need context data but are children of context consumers will still re-render unnecessarily.
 - Strategic placement of context consumers in the component tree is critical for performance optimization.
 - Using component composition patterns (like children props) or memoization techniques may help isolate renders and prevent unnecessary re-renders of components that don't depend on context.
+
+## Test 3: Component Re-Rendering with Local State Changes
+
+### Experimental Setup
+
+- Components with local state using `useState` (e.g., input field in `ListActions`)
+- Child components receiving props that don't change between renders (e.g., `ItemsList` receiving a stable `list` array)
+
+### Re-Render Patterns Observed
+
+- Even when using local state in a parent component (like `list` in `ListActions`), any state change in the parent (e.g., `newListItem`) causes a complete re-render of all child components.
+- The array reference for `list` is preserved between renders, but this alone doesn't prevent child components from re-rendering.
+- Child components re-render not because their props changed, but because their parent component re-rendered.
+
+### Performance Optimizations
+
+- Wrapping child components with `React.memo()` prevents re-renders when their props don't change.
+- Using `React.memo()` on both `ItemsList` and `Item` components effectively breaks the re-render chain for state changes unrelated to the list data.
+- This optimization is important for both context consumers and regular components with local state.

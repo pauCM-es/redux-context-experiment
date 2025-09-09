@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 // Define the context value type
@@ -36,6 +36,18 @@ export const BasicContextProvider: React.FC<BasicContextProviderProps> = ({
 		record,
 		setRecord,
 	};
+
+	// const contextValue: BasicContextValue = useMemo(
+	// 	() => ({
+	// 		counter,
+	// 		setCounter,
+	// 		list,
+	// 		setList,
+	// 		record,
+	// 		setRecord,
+	// 	}),
+	// 	[counter, list, record, setList]
+	// );
 
 	return (
 		<BasicContext.Provider value={contextValue}>

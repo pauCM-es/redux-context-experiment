@@ -6,7 +6,7 @@ import ItemsContainer from "./isolated/ItemsContainer";
 const DrawerContent = () => {
 	console.log("[RENDER] DrawerContent");
 
-	const { counter, list, record } = useBasicContext();
+	// const { counter, list, record } = useBasicContext();
 
 	return (
 		<div className="drawer-context-content">

@@ -40,4 +40,5 @@ const Item: React.FC<ItemProps> = ({ text, index, onRemove }) => {
 	);
 };
 
-export default Item;
+// Utilizamos React.memo para evitar re-renderizados cuando las props no cambien
+export default React.memo(Item);

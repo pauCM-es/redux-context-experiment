@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Item from "./Item";
 
 interface ItemsListProps {
@@ -8,6 +8,10 @@ interface ItemsListProps {
 
 const ItemsList: React.FC<ItemsListProps> = ({ items, onRemoveItem }) => {
 	console.log("[RENDER] ItemsList");
+
+	useEffect(() => {
+		console.log("[EFFECT] ItemsList items prop changed");
+	}, [items]);
 
 	return (
 		<div style={{ padding: "8px 0" }}>
@@ -23,4 +27,5 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onRemoveItem }) => {
 	);
 };
 
-export default ItemsList;
+// Utilizamos React.memo para evitar re-renderizados cuando las props no cambien
+export default React.memo(ItemsList);
