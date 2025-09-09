@@ -20,3 +20,23 @@
 - React's Context API does not implement any automatic optimization to prevent unnecessary renders.
 - Consumer components have no knowledge of which specific part of the context has changed; they only detect that "something" in the context has been modified.
 - For applications with complex state or components that render frequently, this behavior can lead to significant performance issues.
+
+## Test 2: Propagation of Renders Through Component Hierarchy
+
+### Test Configuration
+
+- Creation of isolated components that don't consume the context:
+  - Nested hierarchy of components (Item inside ItemsList inside ItemsContainer)
+  - These isolated components are rendered alongside components that do consume the context
+
+### Render Behavior Findings
+
+- When a parent container component consumes the context hook, all of its children re-render when the context changes, regardless of whether those children consume the context or not.
+- When the parent container does not consume the context hook, the isolated child components do not re-render when the context changes.
+
+### Performance Considerations
+
+- Context consumption affects not just the component itself but its entire descendant tree.
+- Components that don't need context data but are children of context consumers will still re-render unnecessarily.
+- Strategic placement of context consumers in the component tree is critical for performance optimization.
+- Using component composition patterns (like children props) or memoization techniques may help isolate renders and prevent unnecessary re-renders of components that don't depend on context.
