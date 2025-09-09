@@ -1,7 +1,20 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React from "react";
 import type { ReactNode } from "react";
 
-// Define the context value type
+// Este archivo ahora está obsoleto y redirige a los contextos específicos
+// Solo mantenido por compatibilidad con el código existente
+
+import {
+	CombinedContextProvider,
+	useCounterContext,
+	useListContext,
+	useRecordContext,
+	addToList,
+	removeFromList,
+	updateRecord,
+} from "./combinedContext";
+
+// Redefinimos el tipo del contexto básico para mantener la compatibilidad
 interface BasicContextValue {
 	counter: number;
 	setCounter: React.Dispatch<React.SetStateAction<number>>;
@@ -11,10 +24,7 @@ interface BasicContextValue {
 	setRecord: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
-// Create the context with a default value
-const BasicContext = createContext<BasicContextValue | undefined>(undefined);
-
-// Context provider component
+// Context provider component - ahora solo envuelve el provider combinado
 interface BasicContextProviderProps {
 	children: ReactNode;
 }
@@ -22,13 +32,16 @@ interface BasicContextProviderProps {
 export const BasicContextProvider: React.FC<BasicContextProviderProps> = ({
 	children,
 }) => {
-	// State definitions
-	const [counter, setCounter] = useState<number>(0);
-	const [list, setList] = useState<string[]>([]);
-	const [record, setRecord] = useState<Record<string, any>>({});
+	return <CombinedContextProvider>{children}</CombinedContextProvider>;
+};
 
-	// Context value
-	const contextValue: BasicContextValue = {
+// Custom hook para mantener compatibilidad - combina los tres hooks específicos
+export const useBasicContext = (): BasicContextValue => {
+	const { counter, setCounter } = useCounterContext();
+	const { list, setList } = useListContext();
+	const { record, setRecord } = useRecordContext();
+
+	return {
 		counter,
 		setCounter,
 		list,
@@ -36,55 +49,7 @@ export const BasicContextProvider: React.FC<BasicContextProviderProps> = ({
 		record,
 		setRecord,
 	};
-
-	// const contextValue: BasicContextValue = useMemo(
-	// 	() => ({
-	// 		counter,
-	// 		setCounter,
-	// 		list,
-	// 		setList,
-	// 		record,
-	// 		setRecord,
-	// 	}),
-	// 	[counter, list, record, setList]
-	// );
-
-	return (
-		<BasicContext.Provider value={contextValue}>
-			{children}
-		</BasicContext.Provider>
-	);
 };
 
-// Custom hook to use the context
-export const useBasicContext = (): BasicContextValue => {
-	const context = useContext(BasicContext);
-
-	if (context === undefined) {
-		throw new Error(
-			"useBasicContext must be used within a BasicContextProvider"
-		);
-	}
-
-	return context;
-};
-
-// Helper functions for common operations
-export const addToList = (list: string[], item: string): string[] => {
-	return [...list, item];
-};
-
-export const removeFromList = (list: string[], index: number): string[] => {
-	return list.filter((_, i) => i !== index);
-};
-
-export const updateRecord = (
-	record: Record<string, any>,
-	key: string,
-	value: any
-): Record<string, any> => {
-	return {
-		...record,
-		[key]: value,
-	};
-};
+// Re-exportamos las funciones auxiliares para mantener la compatibilidad
+export { addToList, removeFromList, updateRecord };

@@ -1,9 +1,9 @@
-import { useBasicContext } from "../../context/basicContext";
+import { useCounterContext } from "../../context/combinedContext";
 
 const CounterActions = () => {
 	console.log("[RENDER] CounterActions");
 
-	const { setCounter } = useBasicContext();
+	const { setCounter } = useCounterContext();
 
 	const handleIncrementCounter = () => {
 		setCounter((prevCounter) => prevCounter + 1);

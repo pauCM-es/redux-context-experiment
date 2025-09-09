@@ -6,13 +6,14 @@ import {
 } from "../../context/basicContext";
 import Item from "../isolated/Item";
 import ItemsList from "../isolated/ItemsList";
+import { useListContext } from "../../context/listContext";
 
 const ListActions = () => {
 	console.log("[RENDER] ListActions");
 
-	// const { list, setList } = useBasicContext();
+	const { list, setList } = useListContext();
 	const [newListItem, setNewListItem] = useState("");
-	const [list, setList] = useState<string[]>([]);
+	// const [list, setList] = useState<string[]>([]);
 
 	useEffect(() => {
 		console.log("[EFFECT] setList");

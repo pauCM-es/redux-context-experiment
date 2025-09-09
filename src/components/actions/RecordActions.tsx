@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useBasicContext, updateRecord } from "../../context/basicContext";
+import { updateRecord } from "../../context/basicContext";
+import { useRecordContext } from "../../context/recordContext";
 
 const RecordActions = () => {
 	console.log("[RENDER] RecordActions");
 
-	const { record, setRecord } = useBasicContext();
+	const { record, setRecord } = useRecordContext();
 	const [recordKey, setRecordKey] = useState("");
 	const [recordValue, setRecordValue] = useState("");
 

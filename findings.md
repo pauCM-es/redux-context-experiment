@@ -59,3 +59,26 @@
 - Wrapping child components with `React.memo()` prevents re-renders when their props don't change.
 - Using `React.memo()` on both `ItemsList` and `Item` components effectively breaks the re-render chain for state changes unrelated to the list data.
 - This optimization is important for both context consumers and regular components with local state.
+
+## Test 4: Separating Context by State Type
+
+### Context Separation Approach
+
+- Split the original combined context (`BasicContext`) into three separate contexts:
+  - `CounterContext`: Manages only the counter state
+  - `ListContext`: Manages only the list state
+  - `RecordContext`: Manages only the record state
+- Created a `CombinedContextProvider` that nests all three providers
+
+### Expected Behavior
+
+- Components that consume only one specific context (e.g., only `CounterContext`) should re-render only when that specific state changes.
+- Components consuming multiple contexts will still re-render when any of those contexts change.
+- The original `useBasicContext` hook now combines all three specific hooks, maintaining backward compatibility.
+
+### Implications for Performance
+
+- More granular context consumption allows for more precise control over component rendering.
+- Components can subscribe only to the exact state they need, preventing unnecessary re-renders.
+- This pattern follows the principle of separation of concerns and can significantly improve performance in larger applications.
+- Trade-off: Requires more provider nesting and potentially more complex component structure.
