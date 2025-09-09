@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useBasicContext } from "../context/basicContext";
 import { useRecordContext } from "../context/recordContext";
-import { useListContext } from "../context/listContext";
+import { useListDataContext } from "../context/listContext";
 import { useCounterContext } from "../context/counterContext";
 
 // Individual monitor component for counter
@@ -67,7 +67,8 @@ const CounterMonitor = () => {
 const ListMonitor = () => {
 	console.log("[RENDER] ListMonitor");
 
-	const { list } = useListContext();
+	// Using data-only context for monitoring
+	const { list } = useListDataContext();
 	const [stateChanges, setStateChanges] = useState<number>(1);
 	const renderCountRef = useRef<number>(1);
 

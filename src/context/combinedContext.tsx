@@ -24,6 +24,6 @@ export const CombinedContextProvider: React.FC<
 // Re-exportamos los hooks y funciones auxiliares para facilitar su uso
 export { useCounterContext } from "./counterContext";
 
-export { useListContext, addToList, removeFromList } from "./listContext";
+export { useListContext } from "./listContext";
 
 export { useRecordContext, updateRecord } from "./recordContext";

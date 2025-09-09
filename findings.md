@@ -82,3 +82,33 @@
 - Components can subscribe only to the exact state they need, preventing unnecessary re-renders.
 - This pattern follows the principle of separation of concerns and can significantly improve performance in larger applications.
 - Trade-off: Requires more provider nesting and potentially more complex component structure.
+
+## Test 5: Read/Write Separation Pattern
+
+### Context Division Strategy
+
+- Further refined the `ListContext` by splitting it into two separate but related contexts:
+  - `ListDataContext`: Read-only access to the list data (used by monitors/displays)
+  - `ListApiContext`: Access to operations that modify the list (used by action components)
+- Both contexts share the same state internally, but expose different parts to consumers
+
+### Implementation Details
+
+- Created dedicated hooks for each purpose:
+  - `useListDataContext()`: For components that only need to read list data
+  - `useListApiContext()`: For components that need to modify list data
+  - `useListContext()`: Maintained for backward compatibility, provides both data and API
+
+### Benefits Observed
+
+- Clearer separation of concerns between components that display data vs. components that modify data
+- Each component only re-renders when the specific aspects of the context it cares about change
+- Better encapsulation of state management logic within the context provider
+- More explicit API design with dedicated methods instead of raw state setters
+
+### Architectural Implications
+
+- This pattern resembles the Command Query Responsibility Segregation (CQRS) pattern from backend development
+- It scales well to more complex applications by providing clear boundaries between reads and writes
+- Reduces the chance of unnecessary re-renders by limiting what each component subscribes to
+- Trade-off: Increases initial complexity but improves maintainability in the long run

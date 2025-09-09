@@ -9,8 +9,6 @@ import {
 	useCounterContext,
 	useListContext,
 	useRecordContext,
-	addToList,
-	removeFromList,
 	updateRecord,
 } from "./combinedContext";
 
@@ -52,4 +50,4 @@ export const useBasicContext = (): BasicContextValue => {
 };
 
 // Re-exportamos las funciones auxiliares para mantener la compatibilidad
-export { addToList, removeFromList, updateRecord };
+export { updateRecord };
